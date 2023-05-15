@@ -101,6 +101,7 @@ async fn store_on_s3(snapshot: &str) -> anyhow::Result<()> {
 }
 
 #[derive(Clone, Debug, Default, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
 struct DefiLammaPoolInfo {
     pool: String,
     chain: String,
