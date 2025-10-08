@@ -21,7 +21,7 @@ use anchor_spl::{
 };
 use fixed::types::I80F48;
 use marginfi_type_crate::{
-    constants::{ASSET_TAG_DEFAULT, ASSET_TAG_SOL, ASSET_TAG_STAKED},
+    constants::{ASSET_TAG_DEFAULT, ASSET_TAG_KAMINO, ASSET_TAG_SOL, ASSET_TAG_STAKED},
     types::{Bank, BankOperationalState, MarginfiAccount, WrappedI80F48},
 };
 
@@ -188,7 +188,11 @@ fn ceil_div(numerator: u128, denominator: u128) -> Option<u128> {
 }
 
 /// A minimal tool to convert a hex string like "22f123639" into the byte equivalent.
+#[cfg(test)]
 pub fn hex_to_bytes(hex: &str) -> Vec<u8> {
+    if hex.len() % 2 != 0 {
+        panic!("hex string odd size");
+    }
     hex.as_bytes()
         .chunks(2)
         .map(|chunk| {
@@ -213,6 +217,8 @@ pub fn validate_asset_tags(bank: &Bank, marginfi_account: &MarginfiAccount) -> M
                 ASSET_TAG_DEFAULT => has_default_asset = true,
                 ASSET_TAG_SOL => { /* Do nothing, SOL can mix with any asset type */ }
                 ASSET_TAG_STAKED => has_staked_asset = true,
+                // Kamino isn't strictly a default asset but it's close enough
+                ASSET_TAG_KAMINO => has_default_asset = true,
                 _ => panic!("unsupported asset tag"),
             }
         }
@@ -227,6 +233,8 @@ pub fn validate_asset_tags(bank: &Bank, marginfi_account: &MarginfiAccount) -> M
     if bank.config.asset_tag == ASSET_TAG_STAKED && has_default_asset {
         return err!(MarginfiError::AssetTagMismatch);
     }
+
+    // TODO maybe we should allow kamino assets to mix with staked: what's the risk?
 
     Ok(())
 }
@@ -365,4 +373,17 @@ macro_rules! assert_eq_with_tolerance {
             $tolerance
         );
     };
+}
+
+/// Helper function for constraint validation - checks if asset tag is valid for MarginFi operations
+pub fn is_marginfi_asset_tag(asset_tag: u8) -> bool {
+    matches!(
+        asset_tag,
+        ASSET_TAG_DEFAULT | ASSET_TAG_SOL | ASSET_TAG_STAKED
+    )
+}
+
+/// Helper function for constraint validation - checks if asset tag is valid for Kamino operations  
+pub fn is_kamino_asset_tag(asset_tag: u8) -> bool {
+    asset_tag == ASSET_TAG_KAMINO
 }
