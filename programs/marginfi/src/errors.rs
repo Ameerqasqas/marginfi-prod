@@ -231,6 +231,18 @@ pub enum MarginfiError {
     InvalidOrderTakeProfitOrStopLoss,
     #[msg("Max slippage must be less than 100%")] // 6113
     InvalidSlippage,
+    #[msg("Executor withdrew too much: slippage or max fee constraint violated")] // 6114
+    OrderExecutionOverWithdrawal,
+    #[msg("Bank hourly rate limit exceeded: try again later")] // 6115
+    BankHourlyRateLimitExceeded,
+    #[msg("Bank daily rate limit exceeded: try again later")] // 6116
+    BankDailyRateLimitExceeded,
+    #[msg("Group hourly rate limit exceeded: try again later")] // 6117
+    GroupHourlyRateLimitExceeded,
+    #[msg("Group daily rate limit exceeded: try again later")] // 6118
+    GroupDailyRateLimitExceeded,
+    #[msg("Invalid rate limit price: pass oracle or pre-crank cache")] // 6119
+    InvalidRateLimitPrice,
 
     // ************** BEGIN KAMINO ERRORS (starting at 6200)
     #[msg("Wrong asset tag for standard instructions, expected DEFAULT, SOL, or STAKED asset tag")]
@@ -495,6 +507,12 @@ impl From<u32> for MarginfiError {
             6111 => MarginfiError::WorseHealthPostExecution,
             6112 => MarginfiError::InvalidOrderTakeProfitOrStopLoss,
             6113 => MarginfiError::InvalidSlippage,
+            6114 => MarginfiError::OrderExecutionOverWithdrawal,
+            6115 => MarginfiError::BankHourlyRateLimitExceeded,
+            6116 => MarginfiError::BankDailyRateLimitExceeded,
+            6117 => MarginfiError::GroupHourlyRateLimitExceeded,
+            6118 => MarginfiError::GroupDailyRateLimitExceeded,
+            6119 => MarginfiError::InvalidRateLimitPrice,
 
             // Kamino-specific errors (starting at 6200)
             6200 => MarginfiError::WrongAssetTagForStandardInstructions,
