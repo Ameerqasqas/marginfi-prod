@@ -32,7 +32,7 @@ use fixed::types::I80F48;
 use kamino_mocks::kamino_lending::cpi::withdraw_obligation_collateral_and_redeem_reserve_collateral_v2;
 use kamino_mocks::{
     kamino_lending::cpi::accounts::{
-        FarmsAccounts, WithdrawObligationCollateralAndRedeemReserveCollateral,
+        DepositFarmsAccounts, WithdrawObligationCollateralAndRedeemReserveCollateral,
         WithdrawObligationCollateralAndRedeemReserveCollateralV2,
     },
     state::{MinimalObligation, MinimalReserve},
@@ -367,6 +367,7 @@ pub struct KaminoWithdraw<'info> {
 
     /// The liquidity token mint (e.g., USDC)
     /// Needs serde to get the mint decimals for transfer checked
+    /// TODO: rename to just 'mint' to make use of has_one and to be consistent with deposit
     #[account(mut)]
     pub mint: Box<InterfaceAccount<'info, Mint>>,
 
@@ -433,7 +434,7 @@ impl<'info> KaminoWithdraw<'info> {
             user_destination_liquidity: self.liquidity_vault.to_account_info(),
             withdraw_reserve: self.integration_acc_1.to_account_info(),
         };
-        let farms_accounts = FarmsAccounts {
+        let farms_accounts = DepositFarmsAccounts {
             obligation_farm_user_state: optional_account!(self.obligation_farm_user_state),
             reserve_farm_state: optional_account!(self.reserve_farm_state),
         };
