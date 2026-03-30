@@ -1,34 +1,25 @@
 import { BN } from "@coral-xyz/anchor";
 import {
-  PublicKey,
-  SYSVAR_INSTRUCTIONS_PUBKEY,
-  SYSVAR_RENT_PUBKEY,
-  SystemProgram,
   Transaction,
 } from "@solana/web3.js";
 import {
   ecosystem,
   kaminoAccounts,
   KAMINO_USDC_BANK,
-  kaminoGroup,
   MARKET,
   oracles,
   USDC_RESERVE,
   users,
-  verbose,
   bankrunContext,
   bankrunProgram,
   klendBankrunProgram,
-  FARMS_PROGRAM_ID,
   bankRunProvider,
 } from "./rootHooks";
-import { Marginfi } from "../target/types/marginfi";
 import {
   simpleRefreshObligation,
   simpleRefreshReserve,
 } from "./utils/kamino-utils";
-import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import { assert, expect } from "chai";
+import { assert } from "chai";
 import { MockUser, USER_ACCOUNT_K } from "./utils/mocks";
 import { processBankrunTransaction } from "./utils/tools";
 import { ProgramTestContext } from "solana-bankrun";
@@ -85,13 +76,14 @@ describe("k07: Kamino Withdraw Tests", () => {
           marginfiAccount,
           authority: user.wallet.publicKey,
           bank,
+          mint: ecosystem.usdcMint.publicKey,
           destinationTokenAccount: user.usdcAccount,
           lendingMarket: market,
-          reserveLiquidityMint: ecosystem.usdcMint.publicKey,
+          reserve: usdcReserve,
         },
         {
           amount: withdrawAmt,
-          isFinalWithdrawal: isFinalWithdrawal,
+          isWithdrawAll: isFinalWithdrawal,
           remaining: composeRemainingAccounts([
             [bank, oracles.usdcOracle.publicKey, usdcReserve],
           ]),
@@ -167,13 +159,14 @@ describe("k07: Kamino Withdraw Tests", () => {
           marginfiAccount,
           authority: user.wallet.publicKey,
           bank,
+          mint: ecosystem.usdcMint.publicKey,
           destinationTokenAccount: user.usdcAccount,
           lendingMarket: market,
-          reserveLiquidityMint: ecosystem.usdcMint.publicKey,
+          reserve: usdcReserve,
         },
         {
           amount: excessiveWithdrawAmount,
-          isFinalWithdrawal: false,
+          isWithdrawAll: false,
           remaining: composeRemainingAccounts([
             [bank, oracles.usdcOracle.publicKey, usdcReserve],
           ]),
